@@ -1,7 +1,9 @@
-mod config;
+#[macro_use]
+extern crate diesel;
+use diesel::prelude::*;
 
-use crate::config::Name;
+mod entity;
+mod infra;
+mod repo;
 
-fn main() {
-    println!("Hello, world!");
-}
+fn main() {}
