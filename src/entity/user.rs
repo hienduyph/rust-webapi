@@ -1,9 +1,10 @@
 use chrono::{NaiveDateTime, Utc};
 
 use super::repo::RepoResult;
-use crate::config::Name;
+use crate::repo::schema::users;
 
-#[derive(Debug, Clone)]
+#[derive(Queryable, Debug, Clone, Insertable)]
+#[table_name = "users"]
 pub struct User {
     pub id: String,
     pub first_name: String,
@@ -26,7 +27,8 @@ pub struct NewUser {
     pub updated_by: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, AsChangeset)]
+#[table_name = "users"]
 pub struct UpdateUser {
     pub id: String,
     pub first_name: String,
@@ -36,17 +38,17 @@ pub struct UpdateUser {
 }
 
 pub trait UserRepo {
-    fn get_all() -> RepoResult<Vec<User>>;
+    fn get_all(&self) -> RepoResult<Vec<User>>;
 
-    fn find(user_id: uuid::Uuid) -> RepoResult<User>;
+    fn find(&self, user_id: uuid::Uuid) -> RepoResult<User>;
 
-    fn find_by_auth(email: &str, password: &str) -> RepoResult<User>;
+    fn find_by_auth(&self, email: &str, password: &str) -> RepoResult<User>;
 
-    fn create(user: &User) -> RepoResult<User>;
+    fn create(&self, user: &User) -> RepoResult<User>;
 
-    fn update(update_user: &UpdateUser) -> RepoResult<User>;
+    fn update(&self, update_user: &UpdateUser) -> RepoResult<User>;
 
-    fn delete(user_id: uuid::Uuid) -> RepoResult<()>;
+    fn delete(&self, user_id: uuid::Uuid) -> RepoResult<()>;
 }
 
 impl From<NewUser> for User {
