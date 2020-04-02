@@ -11,7 +11,10 @@ pub struct UserDieselImpl<'a> {
 
 impl UserRepo for UserDieselImpl<'_> {
     fn get_all(&self) -> RepoResult<Vec<User>> {
-        Ok(vec![])
+        use super::schema::users::dsl::users;
+        let conn = self.pool.get()?;
+        let all_users = users.load(&conn)?;
+        Ok(all_users.into())
     }
 
     fn find(&self, user_id: uuid::Uuid) -> RepoResult<User> {
@@ -69,4 +72,10 @@ impl UserRepo for UserDieselImpl<'_> {
             .execute(&conn)?;
         Ok(())
     }
+}
+
+#[cfg(test)]
+pub mod test {
+    use super::*;
+    fn test_insert() {}
 }
