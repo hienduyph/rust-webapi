@@ -6,7 +6,6 @@ pub struct HealthResponse {
     pub version: String,
 }
 
-
 pub async fn health() -> Result<impl warp::Reply, warp::Rejection> {
     let resp = HealthResponse {
         status: "ok".into(),
