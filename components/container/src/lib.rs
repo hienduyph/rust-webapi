@@ -8,10 +8,10 @@ pub struct UserContainer {
 
 impl UserContainer {
     pub fn new() -> Self {
-        let pool = Arc::new(rwebapi_diesel_impl::infra::db_pool());
-        let user_repo = Arc::new(rwebapi_diesel_impl::users::UserDieselImpl::new(pool));
-        let svc = Box::new(UserServiceImpl { user_repo });
-        UserContainer { user_service: svc }
+        let pool = Arc::new(rwebapi_diesel_impl::db_pool());
+        let user_repo = Arc::new(rwebapi_diesel_impl::UserDieselImpl::new(pool));
+        let user_service = Box::new(UserServiceImpl { user_repo });
+        UserContainer { user_service }
     }
 }
 

@@ -3,6 +3,9 @@ extern crate diesel;
 
 mod async_pool;
 mod errors;
-pub mod infra;
+mod infra;
 mod schema;
-pub mod users;
+mod users;
+
+pub use infra::{db_pool, DBConn};
+pub use users::*;

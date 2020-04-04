@@ -1,6 +1,8 @@
 use actix_web::{web, Responder};
-use rwebapi_users;
 use serde::{Deserialize, Serialize};
+
+use rwebapi_core::{QueryParams, ResultPaging};
+use rwebapi_users::{User, UserService};
 
 #[derive(Serialize, Deserialize)]
 pub struct CreateUserRequest {
@@ -15,8 +17,9 @@ pub async fn create_user(params: web::Json<CreateUserRequest>) -> impl Responder
 }
 
 pub async fn get_user(
-    user_services: web::Data<Box<dyn rwebapi_users::UserService>>,
-) -> Result<web::Json<Vec<rwebapi_users::User>>, crate::error::ApiError> {
-    let users = user_services.get_ref().users().await?;
+    user_services: web::Data<Box<dyn UserService>>,
+) -> Result<web::Json<ResultPaging<User>>, crate::error::ApiError> {
+    let params = QueryParams { size: 0, page: 0 };
+    let users = user_services.get_ref().users(&params).await?;
     Ok(web::Json(users))
 }
