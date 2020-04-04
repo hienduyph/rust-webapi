@@ -19,6 +19,7 @@ async fn main() -> std::io::Result<()> {
     // construct di
     let svc: Box<&dyn rwebapi_users::UserService> = Box::new(&rwebapi_users::UserServiceImpl {});
     let user_services = web::Data::new(svc);
+
     let addr = "0.0.0.0:8000";
     let server =
         HttpServer::new(move || App::new().app_data(user_services.clone()).configure(routes))

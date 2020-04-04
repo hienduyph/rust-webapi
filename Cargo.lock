@@ -2210,6 +2210,7 @@ dependencies = [
  "actix-rt 1.0.0",
  "actix-service 1.0.5",
  "actix-web",
+ "rwebapi-core",
  "rwebapi-users",
  "serde",
  "serde_derive",
@@ -2232,6 +2233,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rwebapi-core"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_derive",
+ "serde_json",
+]
+
+[[package]]
 name = "rwebapi-users"
 version = "0.1.0"
 dependencies = [
@@ -2251,6 +2261,7 @@ dependencies = [
  "r2d2-diesel",
  "rayon",
  "redis-async",
+ "rwebapi-core",
  "serde",
  "serde_derive",
  "serde_json",
