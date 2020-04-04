@@ -1,4 +1,4 @@
-use rwebapi_users::RepoError;
+use rwebapi_core::RepoError;
 
 #[derive(Debug)]
 pub struct DieselRepoError(RepoError);

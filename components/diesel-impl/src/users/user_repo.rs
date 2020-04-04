@@ -1,13 +1,17 @@
+use std::sync::Arc;
+
 use async_trait::async_trait;
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use std::sync::Arc;
+use futures::future::join_all;
 
 use crate::async_pool;
 use crate::errors::DieselRepoError;
 use crate::infra;
 use crate::schema::users;
-use rwebapi_users::{RepoError, RepoResult, User, UserRepo};
+
+use rwebapi_core::{QueryParams, RepoError, RepoResult, ResultPaging};
+use rwebapi_users::{User, UserRepo};
 
 #[derive(Queryable, Insertable, AsChangeset)]
 #[table_name = "users"]
@@ -63,21 +67,41 @@ impl UserDieselImpl {
     pub fn new(db: Arc<infra::DBConn>) -> Self {
         UserDieselImpl { pool: db }
     }
+
+    async fn total(&self) -> RepoResult<u64> {
+        use crate::schema::users::dsl::users;
+        let pool = self.pool.clone();
+        async_pool::run(move || {
+            let conn = pool.get().unwrap();
+            users.count().get_result(&conn)
+        })
+        .await
+        .map_err(|v| DieselRepoError::from(v).into_inner())
+        .map(|v: i64| v as u64)
+    }
+
+    async fn fetch(&self, query: &QueryParams) -> RepoResult<Vec<User>> {
+        use crate::schema::users::dsl::users;
+        let pool = self.pool.clone();
+        let result = async_pool::run(move || {
+            let conn = pool.get().unwrap();
+            users.load::<UserDiesel>(&conn)
+        })
+        .await
+        .map_err(|v| DieselRepoError::from(v).into_inner())?;
+        Ok(result.into_iter().map(|v| -> User { v.into() }).collect())
+    }
 }
 
 #[async_trait]
 impl UserRepo for UserDieselImpl {
-    async fn get_all(&self) -> RepoResult<Vec<User>> {
-        use crate::schema::users::dsl::users;
-        let conn = self
-            .pool
-            .as_ref()
-            .get()
-            .map_err(|v| DieselRepoError::from(v).into_inner())?;
-        let all_users = async_pool::run(move || users.load::<UserDiesel>(&conn))
-            .await
-            .map_err(|v| DieselRepoError::from(v).into_inner())?;
-        Ok(all_users.into_iter().map(|v| v.into()).collect())
+    async fn get_all(&self, params: &QueryParams) -> RepoResult<ResultPaging<User>> {
+        let total = self.total();
+        let users = self.fetch(params);
+        Ok(ResultPaging {
+            total: total.await?,
+            items: users.await?,
+        })
     }
 
     async fn find(&self, user_id: uuid::Uuid) -> RepoResult<User> {

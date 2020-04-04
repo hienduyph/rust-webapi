@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 
-use super::repo::RepoResult;
+use rwebapi_core::{QueryParams, RepoResult, ResultPaging};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {
@@ -19,7 +19,7 @@ pub struct User {
 
 #[async_trait]
 pub trait UserRepo: Send + Sync {
-    async fn get_all(&self) -> RepoResult<Vec<User>>;
+    async fn get_all(&self, params: &QueryParams) -> RepoResult<ResultPaging<User>>;
 
     async fn find(&self, user_id: uuid::Uuid) -> RepoResult<User>;
 

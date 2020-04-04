@@ -2512,6 +2512,7 @@ dependencies = [
  "chrono",
  "derive_more 0.15.0",
  "diesel",
+ "futures 0.3.4",
  "r2d2",
  "r2d2-diesel",
  "rwebapi-core",
