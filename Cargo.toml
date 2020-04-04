@@ -3,5 +3,6 @@ members = [
   "components/core",
   "components/users",
   "apps/actix",
+  "apps/warp",
 ]
 
