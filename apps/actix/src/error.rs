@@ -1,4 +1,4 @@
-use rwebapi_users::CommonError;
+use rwebapi_core::CommonError;
 
 #[derive(Debug)]
 pub struct ApiError(CommonError);

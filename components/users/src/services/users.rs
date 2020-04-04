@@ -1,13 +1,14 @@
 use crate::entity;
+use rwebapi_core;
 
 pub trait UserService: Send + Sync {
-    fn users(&self) -> Result<Vec<entity::User>, entity::CommonError>;
+    fn users(&self) -> Result<Vec<entity::User>, rwebapi_core::CommonError>;
 }
 
 pub struct UserServiceImpl {}
 
 impl UserService for UserServiceImpl {
-    fn users(&self) -> Result<Vec<entity::User>, entity::CommonError> {
+    fn users(&self) -> Result<Vec<entity::User>, rwebapi_core::CommonError> {
         let users = vec![entity::User {
             id: "111".into(),
             first_name: "Mock".into(),
