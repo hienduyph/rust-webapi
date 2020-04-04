@@ -2,6 +2,7 @@
 members = [
   "components/core",
   "components/users",
+  "components/diesel-impl",
   "apps/actix",
   "apps/warp",
 ]

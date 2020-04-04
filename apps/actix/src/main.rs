@@ -17,8 +17,9 @@ fn routes(cfg: &mut web::ServiceConfig) {
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     // construct di
-    let svc: Box<&dyn rwebapi_users::UserService> = Box::new(&rwebapi_users::UserServiceImpl {});
-    let user_services = web::Data::new(svc);
+    let user_component = rwebapi_container::UserContainer::new();
+    let user_services =
+        web::Data::new(user_component.user_service as Box<dyn rwebapi_users::UserService>);
 
     let addr = "0.0.0.0:8000";
     let server =

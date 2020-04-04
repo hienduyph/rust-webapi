@@ -2462,6 +2462,7 @@ dependencies = [
  "actix-rt 1.0.0",
  "actix-service 1.0.5",
  "actix-web",
+ "rwebapi-container",
  "rwebapi-core",
  "rwebapi-users",
  "serde",
@@ -2473,6 +2474,7 @@ dependencies = [
 name = "rweb-warp"
 version = "0.1.0"
 dependencies = [
+ "rwebapi-container",
  "rwebapi-core",
  "rwebapi-users",
  "serde",
@@ -2483,12 +2485,39 @@ dependencies = [
 ]
 
 [[package]]
+name = "rwebapi-container"
+version = "0.1.0"
+dependencies = [
+ "rwebapi-core",
+ "rwebapi-diesel-impl",
+ "rwebapi-users",
+]
+
+[[package]]
 name = "rwebapi-core"
 version = "0.1.0"
 dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+]
+
+[[package]]
+name = "rwebapi-diesel-impl"
+version = "0.1.0"
+dependencies = [
+ "argon2rs",
+ "chrono",
+ "derive_more 0.15.0",
+ "diesel",
+ "r2d2",
+ "r2d2-diesel",
+ "rwebapi-core",
+ "rwebapi-users",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "uuid 0.7.4",
 ]
 
 [[package]]

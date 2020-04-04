@@ -1,25 +1,22 @@
 use crate::entity;
-use rwebapi_core;
+use rwebapi_core::CommonError;
+use std::sync::Arc;
 
 pub trait UserService: Send + Sync {
-    fn users(&self) -> Result<Vec<entity::User>, rwebapi_core::CommonError>;
+    fn users(&self) -> Result<Vec<entity::User>, CommonError>;
 }
 
-pub struct UserServiceImpl {}
+pub struct UserServiceImpl {
+    pub user_repo: Arc<dyn entity::UserRepo>,
+}
 
 impl UserService for UserServiceImpl {
-    fn users(&self) -> Result<Vec<entity::User>, rwebapi_core::CommonError> {
-        let users = vec![entity::User {
-            id: "111".into(),
-            first_name: "Mock".into(),
-            last_name: "Hehe".into(),
-            email: "hh@tiki.vn".into(),
-            password: "11".into(),
-            created_by: "1".into(),
-            created_at: chrono::Local::now().naive_local(),
-            updated_by: "2".into(),
-            updated_at: chrono::Local::now().naive_local(),
-        }];
+    fn users(&self) -> Result<Vec<entity::User>, CommonError> {
+        let users = self
+            .user_repo
+            .as_ref()
+            .get_all()
+            .map_err(|e| -> CommonError { e.into() })?;
         Ok(users)
     }
 }

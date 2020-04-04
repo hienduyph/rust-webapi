@@ -1,4 +1,4 @@
-use chrono::{NaiveDateTime, Utc};
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 
 use super::repo::RepoResult;
@@ -16,26 +16,7 @@ pub struct User {
     pub updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct NewUser {
-    pub id: String,
-    pub first_name: String,
-    pub last_name: String,
-    pub email: String,
-    pub created_by: String,
-    pub updated_by: String,
-}
-
-#[derive(Debug, Clone, Serialize)]
-pub struct UpdateUser {
-    pub id: String,
-    pub first_name: String,
-    pub last_name: String,
-    pub email: String,
-    pub updated_by: String,
-}
-
-pub trait UserRepo {
+pub trait UserRepo: Send + Sync {
     fn get_all(&self) -> RepoResult<Vec<User>>;
 
     fn find(&self, user_id: uuid::Uuid) -> RepoResult<User>;
@@ -44,25 +25,7 @@ pub trait UserRepo {
 
     fn create(&self, user: &User) -> RepoResult<User>;
 
-    fn update(&self, update_user: &UpdateUser) -> RepoResult<User>;
+    fn update(&self, update_user: &User) -> RepoResult<User>;
 
     fn delete(&self, user_id: uuid::Uuid) -> RepoResult<()>;
-}
-
-impl From<NewUser> for User {
-    fn from(user: NewUser) -> Self {
-        let now = Utc::now().naive_utc();
-        User {
-            id: user.id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email: user.email,
-            // TODO: hash funtion
-            password: "".to_owned(),
-            created_by: user.created_by,
-            created_at: now,
-            updated_by: user.updated_by,
-            updated_at: now,
-        }
-    }
 }

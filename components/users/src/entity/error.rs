@@ -1,6 +1,16 @@
+use rwebapi_core::CommonError;
 
 pub struct RepoError {
     pub message: String,
+}
+
+impl Into<CommonError> for RepoError {
+    fn into(self) -> CommonError {
+        CommonError {
+            message: self.message,
+            code: 1,
+        }
+    }
 }
 
 /// Convert PoolErrors to ApiErrors
