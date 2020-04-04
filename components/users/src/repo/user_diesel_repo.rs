@@ -1,8 +1,6 @@
 use diesel::prelude::*;
 
-use crate::entity::error::RepoError;
-use crate::entity::repo::RepoResult;
-use crate::entity::user::{UpdateUser, User, UserRepo};
+use crate::entity::{RepoError, RepoResult, UpdateUser, User};
 use crate::infra;
 
 pub struct UserDieselImpl<'a> {

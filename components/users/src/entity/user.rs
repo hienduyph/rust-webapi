@@ -2,10 +2,8 @@ use chrono::{NaiveDateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use super::repo::RepoResult;
-use crate::repo::schema::users;
 
-#[derive(Queryable, Debug, Clone, Insertable, Serialize, Deserialize)]
-#[table_name = "users"]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {
     pub id: String,
     pub first_name: String,
@@ -28,8 +26,7 @@ pub struct NewUser {
     pub updated_by: String,
 }
 
-#[derive(Debug, Clone, AsChangeset, Serialize)]
-#[table_name = "users"]
+#[derive(Debug, Clone, Serialize)]
 pub struct UpdateUser {
     pub id: String,
     pub first_name: String,

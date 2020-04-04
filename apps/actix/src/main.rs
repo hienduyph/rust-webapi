@@ -1,27 +1,23 @@
-#[macro_use]
-extern crate diesel;
 use actix_web::{web, App, HttpServer};
+use rwebapi_users;
 
 mod controllers;
-mod entity;
+mod error;
 mod infra;
-mod repo;
-mod services;
 
 fn routes(cfg: &mut web::ServiceConfig) {
-    cfg.route("/health", web::get().to(controllers::health::handle))
+    cfg.route("/health", web::get().to(controllers::health))
         .service(
             web::scope("/users")
-                .route("", web::post().to(controllers::user::create_user))
-                .route("", web::get().to(controllers::user::get_user)),
+                .route("", web::post().to(controllers::create_user))
+                .route("", web::get().to(controllers::get_user)),
         );
 }
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     // construct di
-    let svc: Box<&dyn services::users::UserService> =
-        Box::new(&services::users::UserServiceImpl {});
+    let svc: Box<&dyn rwebapi_users::UserService> = Box::new(&rwebapi_users::UserServiceImpl {});
     let user_services = web::Data::new(svc);
     let addr = "0.0.0.0:8000";
     let server =

@@ -2198,6 +2198,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "rust-webapi"
+version = "0.1.0"
+dependencies = [
+ "actix",
+ "actix-cors",
+ "actix-files",
+ "actix-http-test",
+ "actix-identity",
+ "actix-redis",
+ "actix-rt 1.0.0",
+ "actix-service 1.0.5",
+ "actix-web",
+ "rwebapi-users",
+ "serde",
+ "serde_derive",
+ "serde_json",
+]
+
+[[package]]
 name = "rustc-demangle"
 version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2210,6 +2229,34 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "138e3e0acb6c9fb258b19b67cb8abd63c00679d2851805ea151465464fe9030a"
 dependencies = [
  "semver",
+]
+
+[[package]]
+name = "rwebapi-users"
+version = "0.1.0"
+dependencies = [
+ "argon2rs",
+ "chrono",
+ "derive_more 0.15.0",
+ "diesel",
+ "dotenv",
+ "env_logger",
+ "envy",
+ "futures 0.3.4",
+ "jsonwebtoken",
+ "lazy_static",
+ "listenfd",
+ "log",
+ "r2d2",
+ "r2d2-diesel",
+ "rayon",
+ "redis-async",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "uuid 0.7.4",
+ "validator",
+ "validator_derive",
 ]
 
 [[package]]
@@ -2295,43 +2342,6 @@ dependencies = [
  "itoa",
  "serde",
  "url 2.1.1",
-]
-
-[[package]]
-name = "serverrs"
-version = "0.1.0"
-dependencies = [
- "actix",
- "actix-cors",
- "actix-files",
- "actix-http-test",
- "actix-identity",
- "actix-redis",
- "actix-rt 1.0.0",
- "actix-service 1.0.5",
- "actix-web",
- "argon2rs",
- "chrono",
- "derive_more 0.15.0",
- "diesel",
- "dotenv",
- "env_logger",
- "envy",
- "futures 0.3.4",
- "jsonwebtoken",
- "lazy_static",
- "listenfd",
- "log",
- "r2d2",
- "r2d2-diesel",
- "rayon",
- "redis-async",
- "serde",
- "serde_derive",
- "serde_json",
- "uuid 0.7.4",
- "validator",
- "validator_derive",
 ]
 
 [[package]]
