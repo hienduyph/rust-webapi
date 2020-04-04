@@ -1,0 +1,22 @@
+[package]
+name = "rust-webapi"
+version = "0.1.0"
+authors = ["Hien Pham <hienduyph@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+actix = "0.9.0"
+actix-cors = "0.2.0"
+actix-files = "0.2.1"
+actix-identity = "0.2.1"
+actix-redis = "0.8.0"
+actix-rt = "1"
+actix-service = "1.0.5"
+actix-web = "2"
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
+rwebapi-users = { path = "../../components/users", version = "0.1.0" }
+
+[dev-dependencies]
+actix-http-test = "0.2.0"

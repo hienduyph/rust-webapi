@@ -1,7 +1,5 @@
-use crate::entity::error;
-use crate::entity::user;
-use crate::services::users::UserService;
 use actix_web::{web, Responder};
+use rwebapi_users;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -17,8 +15,8 @@ pub async fn create_user(params: web::Json<CreateUserRequest>) -> impl Responder
 }
 
 pub async fn get_user(
-    user_services: web::Data<Box<&dyn UserService>>,
-) -> Result<web::Json<Vec<user::User>>, error::CommonError> {
+    user_services: web::Data<Box<&dyn rwebapi_users::UserService>>,
+) -> Result<web::Json<Vec<rwebapi_users::User>>, crate::error::ApiError> {
     let users = user_services.get_ref().users()?;
     Ok(web::Json(users))
 }

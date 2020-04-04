@@ -8,7 +8,7 @@ pub struct HealthResponse {
     pub version: String,
 }
 
-pub async fn handle() -> impl Responder {
+pub async fn health() -> impl Responder {
     web::Json(HealthResponse {
         status: "ok".into(),
         version: env!("CARGO_PKG_VERSION").into(),

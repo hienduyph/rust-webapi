@@ -1,3 +1,4 @@
+use diesel;
 use diesel::r2d2::ConnectionManager;
 
 pub type Pool<T> = r2d2::Pool<ConnectionManager<T>>;
