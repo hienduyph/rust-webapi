@@ -2506,7 +2506,9 @@ dependencies = [
 name = "rwebapi-diesel-impl"
 version = "0.1.0"
 dependencies = [
+ "actix-threadpool 0.3.1",
  "argon2rs",
+ "async-trait",
  "chrono",
  "derive_more 0.15.0",
  "diesel",
@@ -2525,9 +2527,9 @@ name = "rwebapi-users"
 version = "0.1.0"
 dependencies = [
  "argon2rs",
+ "async-trait",
  "chrono",
  "derive_more 0.15.0",
- "diesel",
  "dotenv",
  "env_logger",
  "envy",

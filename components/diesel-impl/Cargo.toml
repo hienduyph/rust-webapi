@@ -18,6 +18,8 @@ serde_json = "1.0"
 uuid = { version = "0.7", features = ["serde", "v4"] }
 rwebapi-users = { path = "../users", version = "0.1.0" }
 rwebapi-core= { path = "../core", version = "0.1.0" }
+actix-threadpool = "0.3"
+async-trait = "0.1"
 
 [features]
 cockroach = []

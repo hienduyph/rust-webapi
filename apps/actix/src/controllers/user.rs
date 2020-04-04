@@ -17,6 +17,6 @@ pub async fn create_user(params: web::Json<CreateUserRequest>) -> impl Responder
 pub async fn get_user(
     user_services: web::Data<Box<dyn rwebapi_users::UserService>>,
 ) -> Result<web::Json<Vec<rwebapi_users::User>>, crate::error::ApiError> {
-    let users = user_services.get_ref().users()?;
+    let users = user_services.get_ref().users().await?;
     Ok(web::Json(users))
 }

@@ -1,5 +1,6 @@
 use rwebapi_core::CommonError;
 
+#[derive(Debug)]
 pub struct RepoError {
     pub message: String,
 }
@@ -13,19 +14,3 @@ impl Into<CommonError> for RepoError {
     }
 }
 
-/// Convert PoolErrors to ApiErrors
-impl From<diesel::r2d2::PoolError> for RepoError {
-    fn from(error: diesel::r2d2::PoolError) -> RepoError {
-        RepoError {
-            message: error.to_string(),
-        }
-    }
-}
-
-impl From<diesel::result::Error> for RepoError {
-    fn from(error: diesel::result::Error) -> RepoError {
-        RepoError {
-            message: error.to_string(),
-        }
-    }
-}

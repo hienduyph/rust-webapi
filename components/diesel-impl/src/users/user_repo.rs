@@ -1,7 +1,10 @@
+use async_trait::async_trait;
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use std::sync::Arc;
 
+use crate::async_pool;
+use crate::errors::DieselRepoError;
 use crate::infra;
 use crate::schema::users;
 use rwebapi_users::{RepoError, RepoResult, User, UserRepo};
@@ -62,69 +65,106 @@ impl UserDieselImpl {
     }
 }
 
+#[async_trait]
 impl UserRepo for UserDieselImpl {
-    fn get_all(&self) -> RepoResult<Vec<User>> {
+    async fn get_all(&self) -> RepoResult<Vec<User>> {
         use crate::schema::users::dsl::users;
-        let conn = self.pool.as_ref().get()?;
-        let all_users = users.load::<UserDiesel>(&conn)?;
+        let conn = self
+            .pool
+            .as_ref()
+            .get()
+            .map_err(|v| DieselRepoError::from(v).into_inner())?;
+        let all_users = async_pool::run(move || users.load::<UserDiesel>(&conn))
+            .await
+            .map_err(|v| DieselRepoError::from(v).into_inner())?;
         Ok(all_users.into_iter().map(|v| v.into()).collect())
     }
 
-    fn find(&self, user_id: uuid::Uuid) -> RepoResult<User> {
+    async fn find(&self, user_id: uuid::Uuid) -> RepoResult<User> {
         use crate::schema::users::dsl::{id, users};
-        let conn = self.pool.as_ref().get()?;
-        users
-            .filter(id.eq(user_id.to_string()))
-            .first::<UserDiesel>(&conn)
-            .map_err(|e| RepoError {
-                message: format!("Exec Error: {}", e),
-            })
-            .map(|v| v.into())
+        let conn = self
+            .pool
+            .get()
+            .map_err(|v| DieselRepoError::from(v).into_inner())?;
+        async_pool::run(move || {
+            users
+                .filter(id.eq(user_id.to_string()))
+                .first::<UserDiesel>(&conn)
+        })
+        .await
+        .map_err(|v| DieselRepoError::from(v).into_inner())
+        .map(|v| -> User { v.into() })
     }
 
-    fn find_by_auth(&self, user_email: &str, user_password: &str) -> RepoResult<User> {
+    async fn find_by_auth(&self, user_email: &str, user_password: &str) -> RepoResult<User> {
         use crate::schema::users::dsl::{email, password, users};
-        let conn = self.pool.get()?;
-        users
-            .filter(email.eq(user_email.to_string()))
-            .filter(password.eq(user_password.to_string()))
-            .first::<UserDiesel>(&conn)
-            .map_err(|e| RepoError {
-                message: format!("Invalid login: _{}", e),
-            })
-            .map(|v| v.into())
+        let conn = self
+            .pool
+            .get()
+            .map_err(|v| DieselRepoError::from(v).into_inner())?;
+        let user_email_u = user_email.to_string();
+        let user_password_u = user_password.to_string();
+        async_pool::run(move || {
+            users
+                .filter(email.eq(user_email_u))
+                .filter(password.eq(user_password_u))
+                .first::<UserDiesel>(&conn)
+        })
+        .await
+        .map_err(|v| DieselRepoError::from(v).into_inner())
+        .map(|v| -> User { v.into() })
     }
 
-    fn create(&self, new_user: &User) -> RepoResult<User> {
+    async fn create(&self, new_user: &User) -> RepoResult<User> {
         let u: UserDiesel = UserDiesel::from(new_user.clone());
         use crate::schema::users::dsl::users;
-        let conn = self.pool.get()?;
-        diesel::insert_into(users).values(u).execute(&conn)?;
+        let conn = self
+            .pool
+            .get()
+            .map_err(|v| DieselRepoError::from(v).into_inner())?;
+        async_pool::run(move || diesel::insert_into(users).values(u).execute(&conn))
+            .await
+            .map_err(|v| DieselRepoError::from(v).into_inner())?;
         Ok(new_user.clone())
     }
 
-    fn update(&self, update_user: &User) -> RepoResult<User> {
+    async fn update(&self, update_user: &User) -> RepoResult<User> {
         let u = UserDiesel::from(update_user.clone());
         use crate::schema::users::dsl::{id, users};
-        let conn = self.pool.get()?;
-        diesel::update(users)
-            .filter(id.eq(update_user.id.clone()))
-            .set(u)
-            .execute(&conn)?;
+        let conn = self
+            .pool
+            .get()
+            .map_err(|v| DieselRepoError::from(v).into_inner())?;
+        let id_filter = update_user.id.clone();
+        async_pool::run(move || {
+            diesel::update(users)
+                .filter(id.eq(id_filter))
+                .set(u)
+                .execute(&conn)
+        })
+        .await
+        .map_err(|v| DieselRepoError::from(v).into_inner())?;
         match uuid::Uuid::parse_str(&update_user.id) {
-            Ok(v) => self.find(v),
+            Ok(v) => self.find(v).await,
             Err(e) => Err(RepoError {
                 message: e.to_string(),
             }),
         }
     }
 
-    fn delete(&self, uuid: uuid::Uuid) -> RepoResult<()> {
+    async fn delete(&self, uuid: uuid::Uuid) -> RepoResult<()> {
         use crate::schema::users::dsl::{id, users};
-        let conn = self.pool.get()?;
-        diesel::delete(users)
-            .filter(id.eq(uuid.to_string()))
-            .execute(&conn)?;
+        let conn = self
+            .pool
+            .get()
+            .map_err(|v| DieselRepoError::from(v).into_inner())?;
+        async_pool::run(move || {
+            diesel::delete(users)
+                .filter(id.eq(uuid.to_string()))
+                .execute(&conn)
+        })
+        .await
+        .map_err(|v| DieselRepoError::from(v).into_inner())?;
         Ok(())
     }
 }

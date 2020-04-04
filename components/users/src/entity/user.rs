@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 
@@ -16,16 +17,17 @@ pub struct User {
     pub updated_at: NaiveDateTime,
 }
 
+#[async_trait]
 pub trait UserRepo: Send + Sync {
-    fn get_all(&self) -> RepoResult<Vec<User>>;
+    async fn get_all(&self) -> RepoResult<Vec<User>>;
 
-    fn find(&self, user_id: uuid::Uuid) -> RepoResult<User>;
+    async fn find(&self, user_id: uuid::Uuid) -> RepoResult<User>;
 
-    fn find_by_auth(&self, email: &str, password: &str) -> RepoResult<User>;
+    async fn find_by_auth(&self, email: &str, password: &str) -> RepoResult<User>;
 
-    fn create(&self, user: &User) -> RepoResult<User>;
+    async fn create(&self, user: &User) -> RepoResult<User>;
 
-    fn update(&self, update_user: &User) -> RepoResult<User>;
+    async fn update(&self, update_user: &User) -> RepoResult<User>;
 
-    fn delete(&self, user_id: uuid::Uuid) -> RepoResult<()>;
+    async fn delete(&self, user_id: uuid::Uuid) -> RepoResult<()>;
 }
