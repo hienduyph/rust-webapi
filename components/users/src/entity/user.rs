@@ -10,9 +10,19 @@ pub struct User {
     pub first_name: String,
     pub last_name: String,
     pub email: String,
+    #[serde(skip_serializing)]
     pub password: String,
     pub created_by: String,
     pub created_at: NaiveDateTime,
+    pub updated_by: String,
+    pub updated_at: NaiveDateTime,
+}
+
+#[derive(Debug, Clone)]
+pub struct UserUpdate {
+    pub first_name: String,
+    pub last_name: String,
+    pub email: String,
     pub updated_by: String,
     pub updated_at: NaiveDateTime,
 }
@@ -21,13 +31,13 @@ pub struct User {
 pub trait UserRepo: Send + Sync {
     async fn get_all(&self, params: &dyn QueryParams) -> RepoResult<ResultPaging<User>>;
 
-    async fn find(&self, user_id: uuid::Uuid) -> RepoResult<User>;
+    async fn find(&self, user_id: &str) -> RepoResult<User>;
 
     async fn find_by_auth(&self, email: &str, password: &str) -> RepoResult<User>;
 
     async fn create(&self, user: &User) -> RepoResult<User>;
 
-    async fn update(&self, update_user: &User) -> RepoResult<User>;
+    async fn update(&self, id: &str, update_user: &UserUpdate) -> RepoResult<User>;
 
-    async fn delete(&self, user_id: uuid::Uuid) -> RepoResult<()>;
+    async fn delete(&self, user_id: &str) -> RepoResult<()>;
 }

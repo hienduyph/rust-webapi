@@ -10,7 +10,16 @@ impl UserContainer {
     pub fn new() -> Self {
         let pool = Arc::new(rwebapi_diesel_impl::db_pool());
         let user_repo = Arc::new(rwebapi_diesel_impl::UserDieselImpl::new(pool));
-        let user_service = Box::new(UserServiceImpl { user_repo });
+
+        // init service
+        let password_salt: &str = "aslkdjclkasjdfklq";
+        let user_security: Arc<dyn UserSecurityService> = Arc::new(UserSecurityServiceImpl {
+            salt: password_salt.to_string(),
+        });
+        let user_service = Box::new(UserServiceImpl {
+            user_repo,
+            user_security,
+        });
         UserContainer { user_service }
     }
 }

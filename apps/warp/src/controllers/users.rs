@@ -18,3 +18,4 @@ pub async fn get_user(
         .map_err(|e| reject::custom(ApiError::from(e)))?;
     Ok(warp::reply::json(&users))
 }
+
