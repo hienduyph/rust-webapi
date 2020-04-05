@@ -27,6 +27,12 @@ pub struct UserUpdate {
     pub updated_at: NaiveDateTime,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TokenPayload {
+    pub email: String,
+    pub exp: i64,
+}
+
 #[async_trait]
 pub trait UserRepo: Send + Sync {
     async fn get_all(&self, params: &dyn QueryParams) -> RepoResult<ResultPaging<User>>;

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use actix_web::{web, HttpResponse};
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
@@ -7,6 +9,7 @@ use rwebapi_core::{QueryParamsImpl, ResultPaging};
 use rwebapi_users::{User, UserService, UserUpdate};
 
 use crate::error::ApiError;
+use crate::identity::UserIdentity;
 
 #[derive(Serialize, Deserialize)]
 pub struct CreateUserRequest {
@@ -24,8 +27,9 @@ pub struct UpdateUserRequest {
 }
 
 pub async fn create_user(
-    user_services: web::Data<Box<dyn UserService>>,
+    user_services: web::Data<Arc<Box<dyn UserService>>>,
     params: web::Json<CreateUserRequest>,
+    identity: UserIdentity,
 ) -> Result<web::Json<User>, ApiError> {
     let now = Utc::now().naive_utc();
     let user_id = Uuid::new_v4().to_string();
@@ -35,9 +39,9 @@ pub async fn create_user(
         first_name: params.first_name.to_string(),
         last_name: params.last_name.to_string(),
         updated_at: now,
-        updated_by: user_id.clone(),
+        updated_by: identity.user_id.clone(),
         created_at: now,
-        created_by: user_id.clone(),
+        created_by: identity.user_id.clone(),
         password: params.password.to_string(),
     };
     let created_user = user_services.create(&user).await?;
@@ -45,7 +49,7 @@ pub async fn create_user(
 }
 
 pub async fn get_user(
-    user_services: web::Data<Box<dyn UserService>>,
+    user_services: web::Data<Arc<Box<dyn UserService>>>,
     params: web::Query<QueryParamsImpl>,
 ) -> Result<web::Json<ResultPaging<User>>, ApiError> {
     let users = user_services.get_ref().users(&params.into_inner()).await?;
@@ -53,7 +57,7 @@ pub async fn get_user(
 }
 
 pub async fn get_user_by_id(
-    user_services: web::Data<Box<dyn UserService>>,
+    user_services: web::Data<Arc<Box<dyn UserService>>>,
     user_id: web::Path<String>,
 ) -> Result<web::Json<User>, ApiError> {
     let user = user_services.find_by_id(&user_id).await?;
@@ -61,9 +65,10 @@ pub async fn get_user_by_id(
 }
 
 pub async fn update_user(
-    user_services: web::Data<Box<dyn UserService>>,
+    user_services: web::Data<Arc<Box<dyn UserService>>>,
     user_id: web::Path<String>,
     params: web::Json<UpdateUserRequest>,
+    identity: UserIdentity,
 ) -> Result<web::Json<User>, ApiError> {
     let now = Utc::now().naive_utc();
     let updator_user = UserUpdate {
@@ -71,7 +76,7 @@ pub async fn update_user(
         first_name: params.first_name.to_string(),
         last_name: params.last_name.to_string(),
         updated_at: now,
-        updated_by: user_id.to_string(),
+        updated_by: identity.user_id.clone(),
     };
     println!("Update user {:?}", updator_user);
     let user = user_services.update_by_id(&user_id, &updator_user).await?;
@@ -79,7 +84,7 @@ pub async fn update_user(
 }
 
 pub async fn delete_user(
-    user_services: web::Data<Box<dyn UserService>>,
+    user_services: web::Data<Arc<Box<dyn UserService>>>,
     user_id: web::Path<String>,
 ) -> Result<HttpResponse, ApiError> {
     user_services.delete_by_id(&user_id).await?;

@@ -14,14 +14,16 @@ pub trait UserService: Send + Sync {
 
     async fn find_by_id(&self, id: &str) -> Result<User, CommonError>;
 
+    async fn find_by_email(&self, email: &str) -> Result<User, CommonError>;
+
     async fn update_by_id(&self, id: &str, u: &UserUpdate) -> Result<User, CommonError>;
 
     async fn delete_by_id(&self, id: &str) -> Result<(), CommonError>;
 }
 
 pub struct UserServiceImpl {
-    pub user_repo: Arc<dyn UserRepo>,
-    pub user_security: Arc<dyn UserSecurityService>,
+    pub user_repo: Arc<Box<dyn UserRepo>>,
+    pub user_security: Arc<Box<dyn UserSecurityService>>,
 }
 
 #[async_trait]
@@ -47,6 +49,13 @@ impl UserService for UserServiceImpl {
     async fn find_by_id(&self, id: &str) -> Result<User, CommonError> {
         self.user_repo
             .find(id)
+            .await
+            .map_err(|e| -> CommonError { e.into() })
+    }
+
+    async fn find_by_email(&self, email: &str) -> Result<User, CommonError> {
+        self.user_repo
+            .find_by_email(email)
             .await
             .map_err(|e| -> CommonError { e.into() })
     }

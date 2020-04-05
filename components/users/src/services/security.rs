@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use chrono::{Duration, Utc};
 use serde::{Deserialize, Serialize};
 
-use crate::entity::User;
+use crate::entity::{TokenPayload, User};
 use rwebapi_core::CommonError;
 
 #[async_trait]
@@ -13,17 +13,13 @@ pub trait UserSecurityService: Send + Sync {
     async fn verify_hash(&self, hashed: &str, raw: &str) -> Result<bool, CommonError>;
 
     async fn token_generator(&self, user: &User) -> Result<String, CommonError>;
+
+    async fn decode_token(&self, token: &str) -> Result<TokenPayload, CommonError>;
 }
 
 pub struct UserSecurityServiceImpl {
     pub salt: String,
     pub jwt_key: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Claims {
-    pub email: String,
-    pub exp: i64,
 }
 
 #[async_trait]
@@ -42,7 +38,7 @@ impl UserSecurityService for UserSecurityServiceImpl {
     }
 
     async fn token_generator(&self, user: &User) -> Result<String, CommonError> {
-        let claim = Claims {
+        let claim = TokenPayload {
             email: user.email.clone(),
             exp: (Utc::now() + Duration::days(30)).timestamp(),
         };
@@ -54,5 +50,18 @@ impl UserSecurityService for UserSecurityServiceImpl {
         })?;
         Ok(token)
     }
-}
 
+    async fn decode_token(&self, token: &str) -> Result<TokenPayload, CommonError> {
+        let decoding_key = jsonwebtoken::DecodingKey::from_secret(self.jwt_key.as_ref());
+        jsonwebtoken::decode::<TokenPayload>(
+            token,
+            &decoding_key,
+            &jsonwebtoken::Validation::default(),
+        )
+        .map(|data| data.claims)
+        .map_err(|e| CommonError {
+            message: e.to_string(),
+            code: 403,
+        })
+    }
+}
