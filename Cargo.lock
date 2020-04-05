@@ -2463,6 +2463,7 @@ dependencies = [
  "actix-service 1.0.5",
  "actix-web",
  "chrono",
+ "futures 0.3.4",
  "rwebapi-container",
  "rwebapi-core",
  "rwebapi-users",

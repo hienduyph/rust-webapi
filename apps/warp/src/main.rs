@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use warp::Filter;
 
 use rwebapi_core::QueryParamsImpl;
@@ -10,7 +8,7 @@ mod error;
 fn routes() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
     // construct di
     let user_component = rwebapi_container::UserContainer::new();
-    let user_service = Arc::new(user_component.user_service);
+    let user_service = user_component.user_service.clone();
 
     let health = warp::path!("health")
         .and(warp::get())
