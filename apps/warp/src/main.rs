@@ -1,5 +1,8 @@
 use std::sync::Arc;
+
 use warp::Filter;
+
+use rwebapi_core::QueryParamsImpl;
 
 mod controllers;
 mod error;
@@ -15,6 +18,7 @@ fn routes() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> 
     let users = warp::path!("users")
         .and(warp::get())
         .and(warp::any().map(move || user_service.clone()))
+        .and(warp::query::<QueryParamsImpl>())
         .and_then(controllers::get_user);
     health.or(users)
 }

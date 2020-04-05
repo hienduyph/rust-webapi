@@ -7,7 +7,10 @@ use crate::entity;
 
 #[async_trait]
 pub trait UserService: Send + Sync {
-    async fn users(&self, params: &QueryParams) -> Result<ResultPaging<entity::User>, CommonError>;
+    async fn users(
+        &self,
+        params: &dyn QueryParams,
+    ) -> Result<ResultPaging<entity::User>, CommonError>;
 }
 
 pub struct UserServiceImpl {
@@ -16,7 +19,10 @@ pub struct UserServiceImpl {
 
 #[async_trait]
 impl UserService for UserServiceImpl {
-    async fn users(&self, params: &QueryParams) -> Result<ResultPaging<entity::User>, CommonError> {
+    async fn users(
+        &self,
+        params: &dyn QueryParams,
+    ) -> Result<ResultPaging<entity::User>, CommonError> {
         let users = self
             .user_repo
             .as_ref()
