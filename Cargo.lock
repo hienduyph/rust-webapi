@@ -2462,12 +2462,14 @@ dependencies = [
  "actix-rt 1.0.0",
  "actix-service 1.0.5",
  "actix-web",
+ "chrono",
  "rwebapi-container",
  "rwebapi-core",
  "rwebapi-users",
  "serde",
  "serde_derive",
  "serde_json",
+ "uuid 0.7.4",
 ]
 
 [[package]]

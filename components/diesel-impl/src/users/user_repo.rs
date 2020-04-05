@@ -9,10 +9,10 @@ use crate::errors::DieselRepoError;
 use crate::infra;
 use crate::schema::users;
 
-use rwebapi_core::{QueryParams, RepoError, RepoResult, ResultPaging};
-use rwebapi_users::{User, UserRepo};
+use rwebapi_core::{QueryParams, RepoResult, ResultPaging};
+use rwebapi_users::{User, UserRepo, UserUpdate};
 
-#[derive(Queryable, Insertable, AsChangeset)]
+#[derive(Queryable, Insertable)]
 #[table_name = "users"]
 struct UserDiesel {
     id: String,
@@ -52,6 +52,28 @@ impl From<User> for UserDiesel {
             password: u.password,
             created_at: u.created_at,
             created_by: u.created_by,
+            updated_at: u.updated_at,
+            updated_by: u.updated_by,
+        }
+    }
+}
+
+#[derive(Debug, Clone, AsChangeset)]
+#[table_name = "users"]
+struct UserUpdateDiesel {
+    first_name: String,
+    last_name: String,
+    email: String,
+    updated_by: String,
+    updated_at: NaiveDateTime,
+}
+
+impl From<UserUpdate> for UserUpdateDiesel {
+    fn from(u: UserUpdate) -> Self {
+        UserUpdateDiesel {
+            first_name: u.first_name,
+            last_name: u.last_name,
+            email: u.email,
             updated_at: u.updated_at,
             updated_by: u.updated_by,
         }
@@ -104,20 +126,17 @@ impl UserRepo for UserDieselImpl {
         })
     }
 
-    async fn find(&self, user_id: uuid::Uuid) -> RepoResult<User> {
+    async fn find(&self, user_id: &str) -> RepoResult<User> {
         use crate::schema::users::dsl::{id, users};
         let conn = self
             .pool
             .get()
             .map_err(|v| DieselRepoError::from(v).into_inner())?;
-        async_pool::run(move || {
-            users
-                .filter(id.eq(user_id.to_string()))
-                .first::<UserDiesel>(&conn)
-        })
-        .await
-        .map_err(|v| DieselRepoError::from(v).into_inner())
-        .map(|v| -> User { v.into() })
+        let id_filer = user_id.to_string();
+        async_pool::run(move || users.filter(id.eq(id_filer)).first::<UserDiesel>(&conn))
+            .await
+            .map_err(|v| DieselRepoError::from(v).into_inner())
+            .map(|v| -> User { v.into() })
     }
 
     async fn find_by_auth(&self, user_email: &str, user_password: &str) -> RepoResult<User> {
@@ -152,14 +171,14 @@ impl UserRepo for UserDieselImpl {
         Ok(new_user.clone())
     }
 
-    async fn update(&self, update_user: &User) -> RepoResult<User> {
-        let u = UserDiesel::from(update_user.clone());
+    async fn update(&self, user_id: &str, update_user: &UserUpdate) -> RepoResult<User> {
+        let u = UserUpdateDiesel::from(update_user.clone());
         use crate::schema::users::dsl::{id, users};
         let conn = self
             .pool
             .get()
             .map_err(|v| DieselRepoError::from(v).into_inner())?;
-        let id_filter = update_user.id.clone();
+        let id_filter = user_id.to_string();
         async_pool::run(move || {
             diesel::update(users)
                 .filter(id.eq(id_filter))
@@ -168,23 +187,19 @@ impl UserRepo for UserDieselImpl {
         })
         .await
         .map_err(|v| DieselRepoError::from(v).into_inner())?;
-        match uuid::Uuid::parse_str(&update_user.id) {
-            Ok(v) => self.find(v).await,
-            Err(e) => Err(RepoError {
-                message: e.to_string(),
-            }),
-        }
+        self.find(user_id).await
     }
 
-    async fn delete(&self, uuid: uuid::Uuid) -> RepoResult<()> {
+    async fn delete(&self, user_id: &str) -> RepoResult<()> {
         use crate::schema::users::dsl::{id, users};
         let conn = self
             .pool
             .get()
             .map_err(|v| DieselRepoError::from(v).into_inner())?;
+        let id_filder = user_id.to_string();
         async_pool::run(move || {
             diesel::delete(users)
-                .filter(id.eq(uuid.to_string()))
+                .filter(id.eq(id_filder))
                 .execute(&conn)
         })
         .await

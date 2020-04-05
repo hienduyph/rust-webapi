@@ -10,7 +10,10 @@ fn routes(cfg: &mut web::ServiceConfig) {
         .service(
             web::scope("/users")
                 .route("", web::post().to(controllers::create_user))
-                .route("", web::get().to(controllers::get_user)),
+                .route("", web::get().to(controllers::get_user))
+                .route("/{id}", web::get().to(controllers::get_user_by_id))
+                .route("/{id}", web::put().to(controllers::update_user))
+                .route("/{id}", web::delete().to(controllers::delete_user)),
         );
 }
 
