@@ -139,18 +139,16 @@ impl UserRepo for UserDieselImpl {
             .map(|v| -> User { v.into() })
     }
 
-    async fn find_by_auth(&self, user_email: &str, user_password: &str) -> RepoResult<User> {
+    async fn find_by_email(&self, user_email: &str) -> RepoResult<User> {
         use crate::schema::users::dsl::{email, password, users};
         let conn = self
             .pool
             .get()
             .map_err(|v| DieselRepoError::from(v).into_inner())?;
         let user_email_u = user_email.to_string();
-        let user_password_u = user_password.to_string();
         async_pool::run(move || {
             users
                 .filter(email.eq(user_email_u))
-                .filter(password.eq(user_password_u))
                 .first::<UserDiesel>(&conn)
         })
         .await

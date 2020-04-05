@@ -33,7 +33,7 @@ pub trait UserRepo: Send + Sync {
 
     async fn find(&self, user_id: &str) -> RepoResult<User>;
 
-    async fn find_by_auth(&self, email: &str, password: &str) -> RepoResult<User>;
+    async fn find_by_email(&self, email: &str) -> RepoResult<User>;
 
     async fn create(&self, user: &User) -> RepoResult<User>;
 
