@@ -19,7 +19,7 @@ pub struct User {
 
 #[async_trait]
 pub trait UserRepo: Send + Sync {
-    async fn get_all(&self, params: &QueryParams) -> RepoResult<ResultPaging<User>>;
+    async fn get_all(&self, params: &dyn QueryParams) -> RepoResult<ResultPaging<User>>;
 
     async fn find(&self, user_id: uuid::Uuid) -> RepoResult<User>;
 

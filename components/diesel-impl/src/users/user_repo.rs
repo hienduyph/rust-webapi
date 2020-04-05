@@ -3,7 +3,6 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use futures::future::join_all;
 
 use crate::async_pool;
 use crate::errors::DieselRepoError;
@@ -68,7 +67,7 @@ impl UserDieselImpl {
         UserDieselImpl { pool: db }
     }
 
-    async fn total(&self) -> RepoResult<u64> {
+    async fn total(&self) -> RepoResult<i64> {
         use crate::schema::users::dsl::users;
         let pool = self.pool.clone();
         async_pool::run(move || {
@@ -77,15 +76,16 @@ impl UserDieselImpl {
         })
         .await
         .map_err(|v| DieselRepoError::from(v).into_inner())
-        .map(|v: i64| v as u64)
+        .map(|v: i64| v)
     }
 
-    async fn fetch(&self, query: &QueryParams) -> RepoResult<Vec<User>> {
+    async fn fetch(&self, query: &dyn QueryParams) -> RepoResult<Vec<User>> {
         use crate::schema::users::dsl::users;
         let pool = self.pool.clone();
+        let builder = users.limit(query.limit()).offset(query.offset());
         let result = async_pool::run(move || {
             let conn = pool.get().unwrap();
-            users.load::<UserDiesel>(&conn)
+            builder.load::<UserDiesel>(&conn)
         })
         .await
         .map_err(|v| DieselRepoError::from(v).into_inner())?;
@@ -95,7 +95,7 @@ impl UserDieselImpl {
 
 #[async_trait]
 impl UserRepo for UserDieselImpl {
-    async fn get_all(&self, params: &QueryParams) -> RepoResult<ResultPaging<User>> {
+    async fn get_all(&self, params: &dyn QueryParams) -> RepoResult<ResultPaging<User>> {
         let total = self.total();
         let users = self.fetch(params);
         Ok(ResultPaging {
