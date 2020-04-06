@@ -1,10 +1,13 @@
 use actix_web::{web, App, HttpServer};
 
 mod controllers;
+mod data;
 mod error;
 mod identity;
 mod infra;
 mod middleware;
+
+use crate::data::Data;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
@@ -13,8 +16,8 @@ async fn main() -> std::io::Result<()> {
 
     let user_security_service = user_component.user_security_service.clone();
     let user_service = user_component.user_service.clone();
-    let user_service_data = web::Data::new(user_service.clone());
-    let user_auth_service_data = web::Data::new(user_component.user_auth_service.clone());
+    let user_service_data = Data::from(user_service.clone());
+    let user_auth_service_data = Data::from(user_component.user_auth_service.clone());
 
     let addr = "0.0.0.0:8000";
     let server = HttpServer::new(move || {

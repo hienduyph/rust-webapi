@@ -11,8 +11,8 @@ use futures::Future;
 use rwebapi_users::{UserSecurityService, UserService};
 
 pub struct Auth {
-    pub user_security_service: Arc<Box<dyn UserSecurityService>>,
-    pub user_service: Arc<Box<dyn UserService>>,
+    pub user_security_service: Arc<dyn UserSecurityService>,
+    pub user_service: Arc<dyn UserService>,
 }
 
 impl<S: 'static, B> Transform<S> for Auth
@@ -39,8 +39,8 @@ where
 
 pub struct AuthMiddleWare<S> {
     service: Rc<RefCell<S>>,
-    user_security_service: Arc<Box<dyn UserSecurityService>>,
-    user_service: Arc<Box<dyn UserService>>,
+    user_security_service: Arc<dyn UserSecurityService>,
+    user_service: Arc<dyn UserService>,
 }
 
 impl<S, B> Service for AuthMiddleWare<S>
