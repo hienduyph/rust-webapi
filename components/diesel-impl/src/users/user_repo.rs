@@ -140,7 +140,7 @@ impl UserRepo for UserDieselImpl {
     }
 
     async fn find_by_email(&self, user_email: &str) -> RepoResult<User> {
-        use crate::schema::users::dsl::{email, password, users};
+        use crate::schema::users::dsl::{email, users};
         let conn = self
             .pool
             .get()

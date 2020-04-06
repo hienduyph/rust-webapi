@@ -13,8 +13,8 @@ pub trait UserAuthService: Sync + Send {
 }
 
 pub struct UserAuthServiceImpl {
-    pub user_repo: Arc<Box<dyn UserRepo>>,
-    pub user_security: Arc<Box<dyn UserSecurityService>>,
+    pub user_repo: Arc<dyn UserRepo>,
+    pub user_security: Arc<dyn UserSecurityService>,
 }
 
 #[async_trait]

@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use rwebapi_users::{User, UserAuthService};
 
+use crate::data::Data;
 use crate::error::ApiError;
 
 #[derive(Debug, Deserialize)]
@@ -18,7 +19,7 @@ pub struct LoginResponse {
 }
 
 pub async fn login(
-    auth_service: web::Data<Box<dyn UserAuthService>>,
+    auth_service: Data<dyn UserAuthService>,
     data: web::Json<LoginRequest>,
 ) -> Result<web::Json<LoginResponse>, ApiError> {
     let (user, token) = auth_service.login(&data.email, &data.password).await?;

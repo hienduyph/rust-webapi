@@ -8,7 +8,7 @@ use rwebapi_users::UserService;
 use crate::error::ApiError;
 
 pub async fn get_user(
-    user_services: Arc<Box<dyn UserService>>,
+    user_services: Arc<dyn UserService>,
     params: QueryParamsImpl,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     let users = user_services

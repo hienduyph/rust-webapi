@@ -1,7 +1,6 @@
 use argon2rs::argon2i_simple;
 use async_trait::async_trait;
 use chrono::{Duration, Utc};
-use serde::{Deserialize, Serialize};
 
 use crate::entity::{TokenPayload, User};
 use rwebapi_core::CommonError;
