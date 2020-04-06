@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use actix_web::{web, HttpResponse};
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
@@ -28,7 +26,7 @@ pub struct UpdateUserRequest {
 }
 
 pub async fn create_user(
-    user_services: web::Data<Arc<dyn UserService>>,
+    user_services: Data<dyn UserService>,
     params: web::Json<CreateUserRequest>,
     identity: UserIdentity,
 ) -> Result<web::Json<User>, ApiError> {
