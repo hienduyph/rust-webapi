@@ -5,23 +5,23 @@ authors = ["Hien Pham <hienduyph@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-actix = "0.9.0"
-actix-cors = "0.2.0"
-actix-files = "0.2.1"
-actix-identity = "0.2.1"
-actix-redis = "0.8.0"
-actix-rt = "1"
-actix-service = "1.0.5"
-actix-web = "2"
-serde = "1.0"
-serde_derive = "1.0"
-serde_json = "1.0"
+actix = "0.10.0"
+actix-cors = "0.3.0"
+actix-files = "0.3.0"
+actix-identity = "0.3.1"
+actix-redis = "0.9.1"
+actix-rt = "1.1.1"
+actix-service = "1.0.6"
+actix-web = "3.0.2"
+serde = "1.0.116"
+serde_derive = "1.0.116"
+serde_json = "1.0.57"
 rwebapi-users = { path = "../../components/users", version = "0.1.0" }
 rwebapi-core= { path = "../../components/core", version = "0.1.0" }
 rwebapi-container= { path = "../../components/container", version = "0.1.0" }
-chrono = { version = "0.4", features = ["serde"] }
-uuid = { version = "0.7", features = ["serde", "v4"] }
-futures = "0.3.1"
+chrono = { version = "0.4.15", features = ["serde"] }
+uuid = { version = "0.8.1", features = ["serde", "v4"] }
+futures = "0.3.5"
 
 [dev-dependencies]
-actix-http-test = "0.2.0"
+actix-http-test = "2.0.0"

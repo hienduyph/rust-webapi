@@ -5,23 +5,23 @@ authors = ["Hien Pham <hienduyph@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-tonic = { version = "0.2", features = ["tls"] }
-prost = "0.6"
-tokio = { version = "0.2", features = ["rt-threaded", "time", "stream", "fs", "macros", "uds"] }
-futures = { version = "0.3", default-features = false, features = ["alloc"] }
-async-stream = "0.2"
-tower = "0.3"
+tonic = { version = "0.3.1", features = ["tls"] }
+prost = "0.6.1"
+tokio = { version = "0.2.22", features = ["rt-threaded", "time", "stream", "fs", "macros", "uds"] }
+futures = { version = "0.3.5", default-features = false, features = ["alloc"] }
+async-stream = "0.3.0"
+tower = "0.3.1"
 
 # Required for routeguide
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-rand = "0.7"
+serde = { version = "1.0.116", features = ["derive"] }
+serde_json = "1.0.57"
+rand = "0.7.3"
 
 # Required for wellknown types
-prost-types = "0.6"
+prost-types = "0.6.1"
 
 [build-dependencies]
-tonic-build = { version = "0.2", features = ["prost"] }
+tonic-build = { version = "0.3.1", features = ["prost"] }
 
 [[bin]]
 name = "rweb-grpc-client"
