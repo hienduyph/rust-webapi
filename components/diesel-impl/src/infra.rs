@@ -12,7 +12,8 @@ pub type DBConn = MySQLPool;
 pub type DBConn = SqlitePool;
 
 pub fn db_pool() -> DBConn {
-    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let database_url = std::env::var("DATABASE_URL").unwrap_or("/tmp/test_examples.db".to_string());
+    println!("Using Database {}", database_url);
     let manager = ConnectionManager::<diesel::sqlite::SqliteConnection>::new(database_url);
     Pool::builder()
         .build(manager)

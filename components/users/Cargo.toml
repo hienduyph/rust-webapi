@@ -5,27 +5,27 @@ authors = ["Hien Pham <hienduyph@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-argon2rs = "0.2.1"
-chrono = { version = "0.4", features = ["serde"] }
-derive_more = "0.15"
-dotenv = "0.14"
-envy = "0.4"
-env_logger = "0.6"
-futures = "0.3.1"
-jsonwebtoken = "7"
-lazy_static = "1.4"
-listenfd = "0.3"
-log = "0.4"
-rayon = "1.0"
-redis-async = "0.6.1"
-r2d2 = "0.8"
+argon2rs = "0.2.5"
+chrono = { version = "0.4.15", features = ["serde"] }
+derive_more = "0.99.10"
+dotenv = "0.15.0"
+envy = "0.4.1"
+env_logger = "0.7.1"
+futures = "0.3.5"
+jsonwebtoken = "7.2.0"
+lazy_static = "1.4.0"
+listenfd = "0.3.3"
+log = "0.4.11"
+rayon = "1.4.0"
+redis-async = "0.6.3"
+r2d2 = "0.8.9"
 r2d2-diesel = "1.0.0"
-serde = "1.0"
-serde_derive = "1.0"
-serde_json = "1.0"
-validator = "0.8.0"
-validator_derive = "0.8.0"
-uuid = { version = "0.7", features = ["serde", "v4"] }
-async-trait = "0.1"
+serde = "1.0.116"
+serde_derive = "1.0.116"
+serde_json = "1.0.57"
+validator = "0.11.0"
+validator_derive = "0.11.0"
+uuid = { version = "0.8.1", features = ["serde", "v4"] }
+async-trait = "0.1.40"
 rwebapi-core= { path = "../../components/core", version = "0.1.0" }
 
