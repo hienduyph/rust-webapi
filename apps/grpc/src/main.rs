@@ -34,14 +34,15 @@ impl RouteGuide for RouteGuideImpl {
         Ok(Response::new(Feature::default()))
     }
 
-    type ListFeaturesStream = mpsc::Receiver<Result<Feature, Status>>;
+    type ListFeaturesStream =
+        Pin<Box<dyn Stream<Item = Result<Feature, Status>> + Send + Sync + 'static>>;
 
     async fn list_features(
         &self,
         _request: Request<Rectangle>,
     ) -> Result<Response<Self::ListFeaturesStream>, Status> {
         println!("ListFeatures = {:?}", _request);
-        let (mut tx, rx) = mpsc::channel(4);
+        let (tx, rx) = mpsc::channel(4);
         let features = self.features.clone();
 
         tokio::spawn(async move {
@@ -53,7 +54,10 @@ impl RouteGuide for RouteGuideImpl {
             }
             println!("Done Sending");
         });
-        Ok(Response::new(rx))
+
+        Ok(Response::new(Box::pin(
+            tokio_stream::wrappers::ReceiverStream::new(rx),
+        )))
     }
 
     async fn record_route(
