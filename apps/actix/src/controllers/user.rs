@@ -6,7 +6,6 @@ use uuid::Uuid;
 use rwebapi_core::{QueryParamsImpl, ResultPaging};
 use rwebapi_users::{User, UserService, UserUpdate};
 
-use crate::data::Data;
 use crate::error::ApiError;
 use crate::identity::UserIdentity;
 
@@ -26,7 +25,7 @@ pub struct UpdateUserRequest {
 }
 
 pub async fn create_user(
-    user_services: Data<dyn UserService>,
+    user_services: web::Data<dyn UserService>,
     params: web::Json<CreateUserRequest>,
     identity: UserIdentity,
 ) -> Result<web::Json<User>, ApiError> {
@@ -48,7 +47,7 @@ pub async fn create_user(
 }
 
 pub async fn get_user(
-    user_services: Data<dyn UserService>,
+    user_services: web::Data<dyn UserService>,
     params: web::Query<QueryParamsImpl>,
 ) -> Result<web::Json<ResultPaging<User>>, ApiError> {
     let users = user_services.users(&params.into_inner()).await?;
@@ -56,7 +55,7 @@ pub async fn get_user(
 }
 
 pub async fn get_user_by_id(
-    user_services: Data<dyn UserService>,
+    user_services: web::Data<dyn UserService>,
     user_id: web::Path<String>,
 ) -> Result<web::Json<User>, ApiError> {
     let user = user_services.find_by_id(&user_id).await?;
@@ -64,7 +63,7 @@ pub async fn get_user_by_id(
 }
 
 pub async fn update_user(
-    user_services: Data<dyn UserService>,
+    user_services: web::Data<dyn UserService>,
     user_id: web::Path<String>,
     params: web::Json<UpdateUserRequest>,
     identity: UserIdentity,
@@ -83,7 +82,7 @@ pub async fn update_user(
 }
 
 pub async fn delete_user(
-    user_services: Data<dyn UserService>,
+    user_services: web::Data<dyn UserService>,
     user_id: web::Path<String>,
 ) -> Result<HttpResponse, ApiError> {
     user_services.delete_by_id(&user_id).await?;

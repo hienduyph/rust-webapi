@@ -1,23 +1,20 @@
-use actix_web::{web, App, HttpServer};
+use actix_web::{web,  App, HttpServer};
 
 mod controllers;
-mod data;
 mod error;
 mod identity;
 mod infra;
 mod middleware;
 
-use crate::data::Data;
-
-#[actix_rt::main]
+#[actix_web::main]
 async fn main() -> std::io::Result<()> {
     // construct di
     let user_component = rwebapi_container::UserContainer::new();
 
     let user_security_service = user_component.user_security_service.clone();
     let user_service = user_component.user_service.clone();
-    let user_service_data = Data::from(user_service.clone());
-    let user_auth_service_data = Data::from(user_component.user_auth_service.clone());
+    let user_service_data = web::Data::from(user_service.clone());
+    let user_auth_service_data = web::Data::from(user_component.user_auth_service.clone());
 
     let addr = "0.0.0.0:8000";
     let server = HttpServer::new(move || {
@@ -37,7 +34,7 @@ async fn main() -> std::io::Result<()> {
                     .route("/{id}", web::put().to(controllers::update_user))
                     .route("/{id}", web::delete().to(controllers::delete_user)),
             )
-            .service(web::scope("/heatlh").route("", web::get().to(controllers::health)))
+            .service(web::scope("/health").route("", web::get().to(controllers::health)))
             .service(web::scope("/auth").route("/login", web::post().to(controllers::login)))
     })
     .bind(addr)?;
