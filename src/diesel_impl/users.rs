@@ -21,8 +21,8 @@ struct UserDiesel {
     email: String,
     password: String,
     created_by: String,
-    created_at: NaiveDateTime,
     updated_by: String,
+    created_at: NaiveDateTime,
     updated_at: NaiveDateTime,
 }
 

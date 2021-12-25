@@ -11,6 +11,10 @@ pub fn routes() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejecti
     let user_component = crate::container::UserContainer::new();
     let user_service = user_component.user_service.clone();
 
+    let index = warp::path::end()
+        .and(warp::any())
+        .and_then(self::health::health);
+
     let health = warp::path!("health")
         .and(warp::get())
         .and_then(self::health::health);
@@ -19,5 +23,5 @@ pub fn routes() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejecti
         .and(warp::any().map(move || user_service.clone()))
         .and(warp::query::<QueryParamsImpl>())
         .and_then(self::users::get_user);
-    health.or(users)
+    health.or(users).or(index)
 }
