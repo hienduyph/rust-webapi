@@ -1,0 +1,2 @@
+[print_schema]
+file = "./src/diesel_impl/schema.rs"
