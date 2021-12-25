@@ -1,10 +1,67 @@
-[workspace]
-members = [
-  "components/core",
-  "components/users",
-  "components/diesel-impl",
-  "apps/actix",
-  "apps/warp",
-  "apps/grpc",
-]
+[package]
+name = "rwebapi"
+version = "0.1.0"
+authors = ["Hien Pham <hienduyph@gmail.com>"]
+edition = "2018"
 
+[dependencies]
+actix = "0.10.0"
+actix-cors = "0.5.4"
+actix-files = "0.5.0"
+actix-identity = "0.3.1"
+actix-redis = "0.9.1"
+actix-rt = "2.0.2"
+actix-service = "1.0.6"
+actix-web = "3.3.2"
+
+serde = "1.0.123"
+serde_derive = "1.0.123"
+serde_json = "1.0.62"
+
+chrono = { version = "0.4.19", features = ["serde"] }
+uuid = { version = "0.8.2", features = ["serde", "v4"] }
+
+tonic = { version = "0.4.0", features = ["tls"] }
+prost = "0.7.0"
+tower = "0.4.5"
+prost-types = "0.7.0"
+
+
+tokio = { version = "1.4.0", features = ["rt-multi-thread", "time", "fs", "macros", "net"]}
+futures = { version = "0.3.12", default-features = false, features = ["alloc"] }
+tokio-stream = { version =  "0.1", features = ["net"] }
+async-stream = "0.3.0"
+async-trait = "0.1.52"
+actix-threadpool = "0.3.3"
+argon2rs = "0.2.5"
+
+warp = "0.3.0"
+
+rand = "0.8.3"
+
+diesel = { version = "1.4.5", features = ["chrono", "mysql", "postgres", "sqlite", "r2d2", "uuidv07"] }
+r2d2 = "0.8.9"
+r2d2-diesel = "1.0.0"
+
+derive_more = "0.99.11"
+dotenv = "0.15.0"
+envy = "0.4.2"
+env_logger = "0.8.3"
+jsonwebtoken = "7.2.0"
+lazy_static = "1.4.0"
+listenfd = "0.3.3"
+log = "0.4.14"
+rayon = "1.5.0"
+redis-async = "0.8.1"
+validator = "0.12.0"
+validator_derive = "0.12.0"
+
+[build-dependencies]
+tonic-build = { version = "0.4.0", features = ["prost"] }
+
+[dev-dependencies]
+actix-http-test = "2.1.0"
+
+[features]
+sqlite = []
+default = ["sqlite"]
