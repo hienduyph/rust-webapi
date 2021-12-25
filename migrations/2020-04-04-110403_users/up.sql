@@ -6,8 +6,8 @@ CREATE TABLE users (
   password VARCHAR(122) NOT NULL,
   created_by VARCHAR(36) NOT NULL,
   updated_by VARCHAR(36) NOT NULL,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  created_at Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 insert into users (id, first_name, last_name, email, password, created_by, updated_by) values

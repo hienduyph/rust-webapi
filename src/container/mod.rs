@@ -1,4 +1,3 @@
-use crate::diesel_impl;
 use crate::users::*;
 use std::sync::Arc;
 

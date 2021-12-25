@@ -29,6 +29,7 @@ pub async fn serve() -> std::io::Result<()> {
             )
             .service(web::scope("/health").route("", web::get().to(super::health_handler::health)))
             .service(web::scope("/auth").route("/login", web::post().to(super::auth_handler::login)))
+            .service(web::scope("/").route("", web::get().to(super::health_handler::health)))
     })
     .bind(addr)?;
     println!("Listening in {}", addr);

@@ -7,7 +7,7 @@ table! {
         password -> Text,
         created_by -> Text,
         updated_by -> Text,
-        created_at -> Text,
-        updated_at -> Text,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
     }
 }
