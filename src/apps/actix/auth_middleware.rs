@@ -3,9 +3,9 @@ use std::pin::Pin;
 use std::rc::Rc;
 use std::sync::Arc;
 
-use actix_service::{Service, Transform};
-use actix_web::dev::{ServiceRequest, ServiceResponse};
-use actix_web::{Error, HttpResponse};
+use actix_web::body::EitherBody;
+use actix_web::dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform};
+use actix_web::{Error, HttpMessage, HttpResponse};
 use futures::Future;
 
 use crate::users::{UserSecurityService, UserService};
@@ -15,14 +15,13 @@ pub struct Auth {
     pub user_service: Arc<dyn UserService>,
 }
 
-impl<S: 'static, B> Transform<S> for Auth
+impl<S: 'static, B> Transform<S, ServiceRequest> for Auth
 where
-    S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
+    S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
     S::Future: 'static,
     B: 'static,
 {
-    type Request = ServiceRequest;
-    type Response = ServiceResponse<B>;
+    type Response = ServiceResponse<EitherBody<B>>;
     type Error = Error;
     type InitError = ();
     type Transform = AuthMiddleWare<S>;
@@ -43,25 +42,26 @@ pub struct AuthMiddleWare<S> {
     user_service: Arc<dyn UserService>,
 }
 
-impl<S, B> Service for AuthMiddleWare<S>
+impl<S, B> Service<ServiceRequest> for AuthMiddleWare<S>
 where
-    S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error> + 'static,
+    S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error> + 'static,
     S::Future: 'static,
     B: 'static,
 {
-    type Request = ServiceRequest;
-    type Response = ServiceResponse<B>;
+    type Response = ServiceResponse<EitherBody<B>>;
     type Error = Error;
     type Future = Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>>>>;
 
-    fn poll_ready(
+    forward_ready!(service);
+
+    /* fn poll_ready(
         &mut self,
         ctx: &mut std::task::Context<'_>,
     ) -> std::task::Poll<Result<(), Self::Error>> {
         self.service.poll_ready(ctx)
-    }
+    } */
 
-    fn call(&mut self, req: Self::Request) -> Self::Future {
+    fn call(&self, req: ServiceRequest) -> Self::Future {
         let user_security_service = self.user_security_service.clone();
         let user_svc = self.user_service.clone();
         let mut svc = self.service.clone();
@@ -74,25 +74,30 @@ where
                 .unwrap();
             let parts: Vec<&str> = authorization.split(' ').collect();
             if parts.len() != 2 || parts.is_empty() || parts[0].to_lowercase() != "bearer" {
-                return Ok(req.into_response(HttpResponse::Unauthorized().finish().into_body()));
+                return Ok(
+                    req.into_response(HttpResponse::Unauthorized().finish().map_into_right_body())
+                );
             }
             let token = parts[1];
             let payload = user_security_service.decode_token(&token).await;
             if payload.is_err() {
-                return Ok(req.into_response(HttpResponse::Unauthorized().finish().into_body()));
+                return Ok(
+                    req.into_response(HttpResponse::Unauthorized().finish().map_into_right_body())
+                );
             }
             let user_boxed = user_svc.find_by_email(&payload.unwrap().email).await;
             if user_boxed.is_err() {
-                return Ok(req.into_response(HttpResponse::Unauthorized().finish().into_body()));
+                return Ok(
+                    req.into_response(HttpResponse::Unauthorized().finish().map_into_right_body())
+                );
             }
             let user = user_boxed.unwrap();
             let identity = super::identity::UserIdentity {
                 email: user.email,
                 user_id: user.id,
             };
-            req.head().extensions_mut().insert(identity);
-            let res = svc.call(req).await?;
-            Ok(res)
+            req.extensions_mut().insert(identity);
+            svc.call(req).await.map(ServiceResponse::map_into_left_body)
         })
     }
 }

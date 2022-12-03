@@ -93,8 +93,8 @@ impl UserDieselImpl {
         use super::schema::users::dsl::users;
         let pool = self.pool.clone();
         async_pool::run(move || {
-            let conn = pool.get().unwrap();
-            users.count().get_result(&conn)
+            let mut conn = pool.get().unwrap();
+            users.count().get_result(&mut conn)
         })
         .await
         .map_err(|v| DieselRepoError::from(v).into_inner())
@@ -106,8 +106,8 @@ impl UserDieselImpl {
         let pool = self.pool.clone();
         let builder = users.limit(query.limit()).offset(query.offset());
         let result = async_pool::run(move || {
-            let conn = pool.get().unwrap();
-            builder.load::<UserDiesel>(&conn)
+            let mut conn = pool.get().unwrap();
+            builder.load::<UserDiesel>(&mut conn)
         })
         .await
         .map_err(|v| DieselRepoError::from(v).into_inner())?;
@@ -128,12 +128,12 @@ impl UserRepo for UserDieselImpl {
 
     async fn find(&self, user_id: &str) -> RepoResult<User> {
         use super::schema::users::dsl::{id, users};
-        let conn = self
+        let mut conn = self
             .pool
             .get()
             .map_err(|v| DieselRepoError::from(v).into_inner())?;
         let id_filer = user_id.to_string();
-        async_pool::run(move || users.filter(id.eq(id_filer)).first::<UserDiesel>(&conn))
+        async_pool::run(move || users.filter(id.eq(id_filer)).first::<UserDiesel>(&mut conn))
             .await
             .map_err(|v| DieselRepoError::from(v).into_inner())
             .map(|v| -> User { v.into() })
@@ -141,7 +141,7 @@ impl UserRepo for UserDieselImpl {
 
     async fn find_by_email(&self, user_email: &str) -> RepoResult<User> {
         use super::schema::users::dsl::{email, users};
-        let conn = self
+        let mut conn = self
             .pool
             .get()
             .map_err(|v| DieselRepoError::from(v).into_inner())?;
@@ -149,7 +149,7 @@ impl UserRepo for UserDieselImpl {
         async_pool::run(move || {
             users
                 .filter(email.eq(user_email_u))
-                .first::<UserDiesel>(&conn)
+                .first::<UserDiesel>(&mut conn)
         })
         .await
         .map_err(|v| DieselRepoError::from(v).into_inner())
@@ -159,11 +159,11 @@ impl UserRepo for UserDieselImpl {
     async fn create(&self, new_user: &User) -> RepoResult<User> {
         let u: UserDiesel = UserDiesel::from(new_user.clone());
         use super::schema::users::dsl::users;
-        let conn = self
+        let mut conn = self
             .pool
             .get()
             .map_err(|v| DieselRepoError::from(v).into_inner())?;
-        async_pool::run(move || diesel::insert_into(users).values(u).execute(&conn))
+        async_pool::run(move || diesel::insert_into(users).values(u).execute(&mut conn))
             .await
             .map_err(|v| DieselRepoError::from(v).into_inner())?;
         Ok(new_user.clone())
@@ -172,7 +172,7 @@ impl UserRepo for UserDieselImpl {
     async fn update(&self, user_id: &str, update_user: &UserUpdate) -> RepoResult<User> {
         let u = UserUpdateDiesel::from(update_user.clone());
         use super::schema::users::dsl::{id, users};
-        let conn = self
+        let mut conn = self
             .pool
             .get()
             .map_err(|v| DieselRepoError::from(v).into_inner())?;
@@ -181,7 +181,7 @@ impl UserRepo for UserDieselImpl {
             diesel::update(users)
                 .filter(id.eq(id_filter))
                 .set(u)
-                .execute(&conn)
+                .execute(&mut conn)
         })
         .await
         .map_err(|v| DieselRepoError::from(v).into_inner())?;
@@ -190,7 +190,7 @@ impl UserRepo for UserDieselImpl {
 
     async fn delete(&self, user_id: &str) -> RepoResult<()> {
         use super::schema::users::dsl::{id, users};
-        let conn = self
+        let mut conn = self
             .pool
             .get()
             .map_err(|v| DieselRepoError::from(v).into_inner())?;
@@ -198,7 +198,7 @@ impl UserRepo for UserDieselImpl {
         async_pool::run(move || {
             diesel::delete(users)
                 .filter(id.eq(id_filder))
-                .execute(&conn)
+                .execute(&mut conn)
         })
         .await
         .map_err(|v| DieselRepoError::from(v).into_inner())?;

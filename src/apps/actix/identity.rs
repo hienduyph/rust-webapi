@@ -1,4 +1,4 @@
-use actix_web::{dev::Payload, Error, FromRequest, HttpRequest};
+use actix_web::{dev::Payload, Error, FromRequest, HttpMessage, HttpRequest};
 use futures::future::{ok, Ready};
 
 pub struct UserIdentity {
@@ -7,7 +7,6 @@ pub struct UserIdentity {
 }
 
 impl FromRequest for UserIdentity {
-    type Config = ();
     type Error = Error;
     type Future = Ready<Result<UserIdentity, Error>>;
 
