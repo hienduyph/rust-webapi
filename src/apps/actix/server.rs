@@ -1,4 +1,4 @@
-use actix_web::{web,  App, HttpServer};
+use actix_web::{web, App, HttpServer};
 
 pub async fn serve() -> std::io::Result<()> {
     // construct di
@@ -28,7 +28,9 @@ pub async fn serve() -> std::io::Result<()> {
                     .route("/{id}", web::delete().to(super::user_handler::delete_user)),
             )
             .service(web::scope("/health").route("", web::get().to(super::health_handler::health)))
-            .service(web::scope("/auth").route("/login", web::post().to(super::auth_handler::login)))
+            .service(
+                web::scope("/auth").route("/login", web::post().to(super::auth_handler::login)),
+            )
             .service(web::scope("/").route("", web::get().to(super::health_handler::health)))
     })
     .bind(addr)?;

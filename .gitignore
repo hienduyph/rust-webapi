@@ -2,3 +2,4 @@
 .env
 .dev
 .envrc
+dev.db
