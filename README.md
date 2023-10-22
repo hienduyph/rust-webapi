@@ -20,6 +20,8 @@ cargo run --bin insert_users
 **Run the server**
 
 - [actix-web](./src/apps/actix): `cargo run --bin actix`
+- [axum](./src/apps/axum): `cargo run --bin axum`
+- [warp](./src/apps/warp): `cargo run --bin warp`
 
 **Check the server's running**
 
@@ -42,8 +44,3 @@ export TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"email":
 curl -s -H "Authorization: bearer $TOKEN" http://127.0.0.1:8000/users
 curl -s -H "Authorization: bearer $TOKEN" http://127.0.0.1:8000/users/1802d2f8-1a18-43c1-9c58-1c3f7100c842
 ```
-
-## More Impl
-
-- [warp](./src/apps/warp): `cargo run --bin warp`
-- [grpc](./src/apps/warp): `cargo run --bin grpc`
