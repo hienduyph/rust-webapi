@@ -2,7 +2,7 @@ use actix_web::{web, App, HttpServer};
 
 pub async fn serve() -> std::io::Result<()> {
     // construct di
-    let user_component = crate::container::UserContainer::new();
+    let user_component = crate::container::UserContainer::new().await;
 
     let user_security_service = user_component.user_security_service.clone();
     let user_service = user_component.user_service.clone();

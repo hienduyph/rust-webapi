@@ -8,7 +8,10 @@ pub struct UserContainer {
 }
 
 impl UserContainer {
-    pub fn new() -> Self {
+    pub async fn new() -> Self {
+        let sqlx_pool = crate::infra::db_conn().await;
+        let sqlx_user_repo: Arc<dyn UserRepo> =
+            Arc::new(crate::users::UserSqlxRepoImpl::new(sqlx_pool.clone()));
         let pool = Arc::new(crate::diesel_impl::db_pool());
         let user_repo: Arc<dyn UserRepo> = Arc::new(crate::diesel_impl::UserDieselImpl::new(pool));
 
@@ -20,7 +23,7 @@ impl UserContainer {
             });
 
         let user_service: Arc<dyn UserService> = Arc::new(UserServiceImpl {
-            user_repo: user_repo.clone(),
+            user_repo: sqlx_user_repo.clone(),
             user_security: user_security_service.clone(),
         });
         let user_auth_service: Arc<dyn UserAuthService> = Arc::new(UserAuthServiceImpl {
@@ -33,11 +36,5 @@ impl UserContainer {
             user_auth_service,
             user_security_service,
         }
-    }
-}
-
-impl Default for UserContainer {
-    fn default() -> Self {
-        Self::new()
     }
 }

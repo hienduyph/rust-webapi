@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 pub async fn serve() -> std::io::Result<()> {
     // construct di
-    let user_component = crate::container::UserContainer::new();
+    let user_component = crate::container::UserContainer::new().await;
 
     let app = Router::new()
         .route("/", get(health))
