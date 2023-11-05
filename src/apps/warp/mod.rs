@@ -1,14 +1,13 @@
-use warp::Filter;
 use crate::core::QueryParamsImpl;
+use warp::Filter;
 
+pub mod error;
 pub mod health;
 pub mod users;
-pub mod error;
 
-
-pub fn routes() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
+pub async fn routes() -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
     // construct di
-    let user_component = crate::container::UserContainer::new();
+    let user_component = crate::container::UserContainer::new().await;
     let user_service = user_component.user_service.clone();
 
     let index = warp::path::end()

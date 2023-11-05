@@ -3,7 +3,7 @@ use chrono::Utc;
 use crate::users::User;
 
 pub async fn run() -> std::io::Result<()> {
-    let cmp = crate::container::UserContainer::new();
+    let cmp = crate::container::UserContainer::new().await;
     let user_service = cmp.user_service;
     let now = Utc::now().naive_utc();
     let user = User {
