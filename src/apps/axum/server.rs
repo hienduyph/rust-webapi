@@ -16,12 +16,10 @@ pub async fn serve() -> std::io::Result<()> {
         )
         .route("/health", get(health));
 
-    let addr = "0.0.0.0:8000".parse().unwrap();
+    let addr = "0.0.0.0:8000";
     println!("Listening {:?}", addr);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    axum::serve(listener, app).await.unwrap();
     Ok(())
 }
 
