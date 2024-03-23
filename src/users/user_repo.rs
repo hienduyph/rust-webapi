@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use tokio::join;
 
 use crate::core::{QueryParams, RepoResult, ResultPaging};
 
@@ -17,25 +18,23 @@ impl UserSqlxRepoImpl {
 #[async_trait]
 impl UserRepo for UserSqlxRepoImpl {
     async fn get_all(&self, params: &dyn QueryParams) -> RepoResult<ResultPaging<User>> {
-        let count = sqlx::query!("SELECT COUNT(*) AS count FROM users")
-            .fetch_one(&self.pool.clone())
-            .await
-            .unwrap()
-            .count;
+        let pool = self.pool.clone();
+        let count_fut = sqlx::query!("SELECT COUNT(*) AS count FROM users").fetch_one(&pool);
+
         let limit = params.limit();
         let offset = params.offset();
-        let users = sqlx::query_as!(
+        let users_fut = sqlx::query_as!(
             User,
             r#"SELECT * FROM users ORDER BY id LIMIT ? OFFSET ?"#,
             limit,
             offset,
         )
-        .fetch_all(&self.pool.clone())
-        .await
-        .unwrap();
+        .fetch_all(&pool);
+        let (count, users) = join!(count_fut, users_fut);
+
         return Ok(ResultPaging {
-            total: count as i64,
-            items: users,
+            total: count.unwrap().count as i64,
+            items: users.unwrap(),
         });
     }
 
@@ -64,6 +63,10 @@ impl UserRepo for UserSqlxRepoImpl {
     }
 
     async fn delete(&self, user_id: &str) -> RepoResult<()> {
-        panic!("impl")
+        sqlx::query!("DELETE FROM users WHERE id = ?", user_id)
+            .execute(&self.pool.clone())
+            .await
+            .unwrap();
+        Ok(())
     }
 }
