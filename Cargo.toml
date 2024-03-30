@@ -19,13 +19,13 @@ prost-types = "0.12.3"
 
 warp = "0.3.6"
 
-axum = "0.7.4"
+axum = "0.7.5"
 
 rand = "0.8.5"
 serde = "1.0.197"
 serde_derive = "1.0.197"
-serde_json = "1.0.114"
-chrono = { version = "0.4.35", features = ["serde"] }
+serde_json = "1.0.115"
+chrono = { version = "0.4.37", features = ["serde"] }
 uuid = { version = "1.8.0", features = ["serde", "v4"] }
 argon2rs = "0.2.5"
 derive_more = "0.99.17"
@@ -36,16 +36,16 @@ jsonwebtoken = "9.3.0"
 lazy_static = "1.4.0"
 listenfd = "1.0.1"
 log = "0.4.21"
-rayon = "1.9.0"
-redis-async = "0.17.0"
+rayon = "1.10.0"
+redis-async = "0.17.1"
 validator = "0.17.0"
 validator_derive = "0.17.0"
 
-tokio = { version = "1.36.0", features = ["rt-multi-thread", "time", "fs", "macros", "net"] }
+tokio = { version = "1.37.0", features = ["rt-multi-thread", "time", "fs", "macros", "net"] }
 futures = { version = "0.3.30", default-features = false, features = ["alloc"] }
 tokio-stream = { version = "0.1.15", features = ["net"] }
 async-stream = "0.3.5"
-async-trait = "0.1.78"
+async-trait = "0.1.79"
 
 diesel = { version = "2.1.5", features = ["chrono", "mysql", "postgres", "sqlite", "r2d2"] }
 r2d2 = "0.8.10"
