@@ -8,7 +8,7 @@ use actix_web::dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Tr
 use actix_web::{Error, HttpMessage, HttpResponse};
 use futures::Future;
 
-use crate::users::{UserSecurityService, UserService};
+use crate::users::{UserIdentity, UserSecurityService, UserService};
 
 pub struct Auth {
     pub user_security_service: Arc<dyn UserSecurityService>,
@@ -64,7 +64,7 @@ where
     fn call(&self, req: ServiceRequest) -> Self::Future {
         let user_security_service = self.user_security_service.clone();
         let user_svc = self.user_service.clone();
-        let mut svc = self.service.clone();
+        let svc = self.service.clone();
         Box::pin(async move {
             let authorization = req
                 .headers()
@@ -79,7 +79,7 @@ where
                 );
             }
             let token = parts[1];
-            let payload = user_security_service.decode_token(&token).await;
+            let payload = user_security_service.decode_token(token).await;
             if payload.is_err() {
                 return Ok(
                     req.into_response(HttpResponse::Unauthorized().finish().map_into_right_body())
@@ -92,7 +92,7 @@ where
                 );
             }
             let user = user_boxed.unwrap();
-            let identity = super::identity::UserIdentity {
+            let identity = UserIdentity {
                 email: user.email,
                 user_id: user.id,
             };

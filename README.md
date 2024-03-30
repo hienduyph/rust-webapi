@@ -19,16 +19,15 @@ cargo run --bin insert_users
 
 **Run the server**
 
-- [actix-web](./src/apps/actix): `cargo run --bin actix`
 - [axum](./src/apps/axum): `cargo run --bin axum`
 - [warp](./src/apps/warp): `cargo run --bin warp`
+- [actix-web](./src/apps/actix): `cargo run --bin actix`
 
 **Check the server's running**
 
 ```bash
 curl http://127.0.0.1:8000/
 curl http://127.0.0.1:8000/health
-
 ```
 
 **Login**

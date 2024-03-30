@@ -8,6 +8,27 @@ use crate::core::CommonError;
 #[derive(Debug)]
 pub struct ApiError(CommonError);
 
+impl ApiError {
+    pub fn bad_request(cause: String) -> Self {
+        ApiError(CommonError {
+            message: cause,
+            code: 400,
+        })
+    }
+    pub fn forbidden(cause: String) -> Self {
+        ApiError(CommonError {
+            message: cause,
+            code: 403,
+        })
+    }
+    pub fn unauthorized(cause: String) -> Self {
+        ApiError(CommonError {
+            message: cause,
+            code: 401,
+        })
+    }
+}
+
 /// Convert PoolErrors to ApiErrors
 impl From<CommonError> for ApiError {
     fn from(error: CommonError) -> ApiError {
@@ -23,6 +44,10 @@ impl std::fmt::Display for ApiError {
 
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
-        (axum::http::StatusCode::BAD_REQUEST, Json(self.0)).into_response()
+        (
+            axum::http::StatusCode::from_u16(self.0.code as u16).unwrap(),
+            Json(self.0),
+        )
+            .into_response()
     }
 }

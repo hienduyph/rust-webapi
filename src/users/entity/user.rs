@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::core::{QueryParams, RepoResult, ResultPaging};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct User {
     pub id: String,
     pub first_name: String,

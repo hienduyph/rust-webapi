@@ -1,10 +1,7 @@
 use actix_web::{dev::Payload, Error, FromRequest, HttpMessage, HttpRequest};
 use futures::future::{ok, Ready};
 
-pub struct UserIdentity {
-    pub email: String,
-    pub user_id: String,
-}
+use crate::users::UserIdentity;
 
 impl FromRequest for UserIdentity {
     type Error = Error;

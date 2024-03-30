@@ -1,47 +1,19 @@
 use actix_web::{web, HttpResponse};
 use chrono::Utc;
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use crate::core::{QueryParamsImpl, ResultPaging};
-use crate::users::{User, UserService, UserUpdate};
+use crate::users::{
+    CreateUserRequest, UpdateUserRequest, User, UserIdentity, UserService, UserUpdate,
+};
 
 use super::error::ApiError;
-use super::identity::UserIdentity;
-
-#[derive(Serialize, Deserialize)]
-pub struct CreateUserRequest {
-    first_name: String,
-    last_name: String,
-    email: String,
-    password: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct UpdateUserRequest {
-    first_name: String,
-    last_name: String,
-    email: String,
-}
 
 pub async fn create_user(
     user_services: web::Data<dyn UserService>,
     params: web::Json<CreateUserRequest>,
     identity: UserIdentity,
 ) -> Result<web::Json<User>, ApiError> {
-    let now = Utc::now().naive_utc();
-    let user_id = Uuid::new_v4().to_string();
-    let user = User {
-        id: user_id.to_string(),
-        email: params.email.to_string(),
-        first_name: params.first_name.to_string(),
-        last_name: params.last_name.to_string(),
-        updated_at: now,
-        updated_by: identity.user_id.clone(),
-        created_at: now,
-        created_by: identity.user_id.clone(),
-        password: params.password.to_string(),
-    };
+    let user = params.to_user(identity.user_id);
     let created_user = user_services.create(&user).await?;
     Ok(web::Json(created_user))
 }
