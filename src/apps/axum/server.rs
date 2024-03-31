@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use super::state::AppState;
 use axum::{
+    handler::Handler,
     middleware,
     routing::{get, post},
     Json, Router,
@@ -14,14 +15,16 @@ use crate::{
         user_handler::{users_by_id, users_create, users_list},
     },
     container::UserContainer,
+    infra::redis_client,
 };
 
 pub async fn serve() -> std::io::Result<()> {
     // construct di
     let user_component = UserContainer::new();
-    let ctx = Arc::new(AppState {
+    let ctx = AppState {
         user_c: user_component.clone(),
-    });
+        redis_pool: redis_client().await,
+    };
 
     let user_routes = Router::new()
         .route(
@@ -32,10 +35,7 @@ pub async fn serve() -> std::io::Result<()> {
             "/",
             post(users_create).with_state(user_component.user_service.clone()),
         )
-        .route(
-            "/:user_id",
-            get(users_by_id).with_state(user_component.user_service.clone()),
-        )
+        .route("/:user_id", get(users_by_id))
         .route_layer(middleware::from_fn_with_state(ctx.clone(), auth_required));
 
     let app = Router::new()

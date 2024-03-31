@@ -10,7 +10,7 @@ pub struct User {
     pub first_name: String,
     pub last_name: String,
     pub email: String,
-    #[serde(skip_serializing)]
+    #[serde(skip_serializing, skip_deserializing)]
     pub password: String,
     pub created_by: String,
     pub created_at: NaiveDateTime,

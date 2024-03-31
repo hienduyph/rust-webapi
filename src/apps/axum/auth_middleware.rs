@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use super::{error::ApiError, state::AppState};
 use crate::users::UserIdentity;
 use axum::extract::{Request, State};
@@ -8,7 +6,7 @@ use axum::middleware::Next;
 use axum::response::IntoResponse;
 
 pub async fn auth_required(
-    State(app_state): State<Arc<AppState>>,
+    State(app_state): State<AppState>,
     mut request: Request,
     next: Next,
 ) -> Result<impl IntoResponse, ApiError> {
