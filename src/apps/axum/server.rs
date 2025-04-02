@@ -33,7 +33,7 @@ pub async fn serve() -> std::io::Result<()> {
             post(users_create).with_state(user_component.user_service.clone()),
         )
         .route(
-            "/:user_id",
+            "/{user_id}",
             get(users_by_id).with_state(user_component.user_service.clone()),
         )
         .route_layer(middleware::from_fn_with_state(ctx.clone(), auth_required));
